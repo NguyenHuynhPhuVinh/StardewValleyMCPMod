@@ -1,0 +1,55 @@
+# Visual Studio và .NET
+.vs/
+bin/
+obj/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Stardew Valley mod
+*.zip
+*.dll.config
+
+# Thư mục build
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Rider
+.idea/
+*.sln.iml
+
+# Tệp tạm thời
+*~
+*.swp
+*.bak
+*.tmp
