@@ -24,7 +24,7 @@ namespace TestMod_SV.Services
         /// <returns>Thông tin túi đồ</returns>
         public InventoryModel GetPlayerInventory()
         {
-            _monitor.Log("Đang lấy thông tin túi đồ qua API", StardewModdingAPI.LogLevel.Info);
+            _monitor.Log("Đang lấy thông tin túi đồ qua API", LogLevel.Info);
 
             var inventory = new InventoryModel
             {
