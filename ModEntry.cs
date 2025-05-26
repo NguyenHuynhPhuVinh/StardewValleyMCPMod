@@ -8,6 +8,7 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValleyMCP.Api;
+using StardewValleyMCP.Api.Controllers;
 using StardewValleyMCP.Services;
 
 namespace StardewValleyMCP
@@ -73,11 +74,17 @@ namespace StardewValleyMCP
             {
                 this.Monitor.Log($"Đang khởi động máy chủ API tại http://localhost:{ApiPort}", StardewModdingAPI.LogLevel.Info);
 
-                // Tạo dịch vụ quản lý túi đồ
+                // Tạo các dịch vụ
                 var inventoryService = new InventoryService(this.Monitor);
+                var worldService = new WorldService(this.Monitor);
 
                 // Tạo và khởi động máy chủ HTTP
-                _httpServer = new HttpServer(ApiPort, this.Monitor, inventoryService);
+                _httpServer = new HttpServer(ApiPort, this.Monitor);
+                
+                // Đăng ký các controller
+                _httpServer.RegisterController("inventory", new InventoryApiController(this.Monitor, inventoryService));
+                _httpServer.RegisterController("world", new WorldApiController(this.Monitor, worldService));
+                
                 _httpServer.Start();
             }
             catch (Exception ex)

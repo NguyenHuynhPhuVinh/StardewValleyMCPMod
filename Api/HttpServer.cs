@@ -3,7 +3,6 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using StardewModdingAPI;
-using StardewValleyMCP.Api.Controllers;
 using StardewValleyMCP.Services;
 
 namespace StardewValleyMCP.Api
@@ -26,8 +25,7 @@ namespace StardewValleyMCP.Api
         /// </summary>
         /// <param name="port">Cổng để lắng nghe</param>
         /// <param name="monitor">Monitor để ghi log</param>
-        /// <param name="inventoryService">Dịch vụ quản lý túi đồ</param>
-        public HttpServer(int port, IMonitor monitor, IInventoryService inventoryService)
+        public HttpServer(int port, IMonitor monitor)
         {
             _port = port;
             _url = $"http://localhost:{port}/";
@@ -36,11 +34,20 @@ namespace StardewValleyMCP.Api
             _listener.Prefixes.Add(_url);
             _monitor = monitor;
             
-            // Khởi tạo router và đăng ký các controller
+            // Khởi tạo router
             _router = new ApiRouter(monitor);
-            _router.RegisterController("inventory", new InventoryApiController(monitor, inventoryService));
             
             _isRunning = false;
+        }
+        
+        /// <summary>
+        /// Đăng ký một controller cho một đường dẫn cụ thể
+        /// </summary>
+        /// <param name="path">Đường dẫn cơ sở (ví dụ: "inventory")</param>
+        /// <param name="controller">Controller để xử lý yêu cầu</param>
+        public void RegisterController(string path, ApiController controller)
+        {
+            _router.RegisterController(path, controller);
         }
 
         /// <summary>
