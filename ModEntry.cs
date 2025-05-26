@@ -7,10 +7,10 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
-using TestMod_SV.Api;
-using TestMod_SV.Services;
+using StardewValleyMCP.Api;
+using StardewValleyMCP.Services;
 
-namespace TestMod_SV
+namespace StardewValleyMCP
 {
     /// <summary>The mod entry point.</summary>
     internal sealed class ModEntry : Mod

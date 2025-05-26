@@ -3,10 +3,10 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using StardewModdingAPI;
-using TestMod_SV.Api.Controllers;
-using TestMod_SV.Services;
+using StardewValleyMCP.Api.Controllers;
+using StardewValleyMCP.Services;
 
-namespace TestMod_SV.Api
+namespace StardewValleyMCP.Api
 {
     /// <summary>
     /// Máy chủ HTTP đơn giản sử dụng HttpListener

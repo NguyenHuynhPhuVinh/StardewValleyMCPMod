@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using StardewModdingAPI;
 
-namespace TestMod_SV.Api
+namespace StardewValleyMCP.Api
 {
     /// <summary>
     /// Lớp cơ sở cho các controller API

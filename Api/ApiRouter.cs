@@ -4,7 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using StardewModdingAPI;
 
-namespace TestMod_SV.Api
+namespace StardewValleyMCP.Api
 {
     /// <summary>
     /// Bộ định tuyến API

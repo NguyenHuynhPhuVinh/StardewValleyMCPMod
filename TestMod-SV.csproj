@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>TestMod_SV</RootNamespace>
+    <RootNamespace>StardewValleyMCP</RootNamespace>
+    <AssemblyName>StardewValleyMCP</AssemblyName>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GamePath>C:\Users\Public\Documents\Stardew Valley</GamePath>

@@ -3,9 +3,9 @@ using System.Net;
 using System.Threading.Tasks;
 using StardewModdingAPI;
 using StardewValley;
-using TestMod_SV.Services;
+using StardewValleyMCP.Services;
 
-namespace TestMod_SV.Api.Controllers
+namespace StardewValleyMCP.Api.Controllers
 {
     /// <summary>
     /// Controller API cho túi đồ

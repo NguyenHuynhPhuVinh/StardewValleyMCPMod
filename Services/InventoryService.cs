@@ -1,10 +1,10 @@
 using StardewValley;
 using System;
 using System.Linq;
-using TestMod_SV.Models;
+using StardewValleyMCP.Models;
 using StardewModdingAPI;
 
-namespace TestMod_SV.Services
+namespace StardewValleyMCP.Services
 {
     /// <summary>
     /// Dịch vụ quản lý túi đồ

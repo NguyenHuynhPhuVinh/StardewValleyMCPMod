@@ -1,10 +1,10 @@
 {
-    "Name": "TestMod-SV",
+    "Name": "Stardew Valley MCP Mod",
     "Author": "TomiSakae",
     "Version": "1.0.0",
-    "Description": "TestMod-SV",
-    "UniqueID": "TomiSakae.TestMod-SV",
-    "EntryDll": "TestMod-SV.dll",
+    "Description": "Mod cung cấp API HTTP để truy cập thông tin túi đồ trong game",
+    "UniqueID": "TomiSakae.StardewValleyMCP",
+    "EntryDll": "StardewValleyMCP.dll",
     "MinimumApiVersion": "4.0.0",
     "UpdateKeys": []
 }

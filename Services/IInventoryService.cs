@@ -1,6 +1,6 @@
-using TestMod_SV.Models;
+using StardewValleyMCP.Models;
 
-namespace TestMod_SV.Services
+namespace StardewValleyMCP.Services
 {
     /// <summary>
     /// Interface cho dịch vụ quản lý túi đồ

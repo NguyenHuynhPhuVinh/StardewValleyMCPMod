@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TestMod_SV.Models
+namespace StardewValleyMCP.Models
 {
     /// <summary>
     /// Mô hình đại diện cho một vật phẩm trong túi đồ
