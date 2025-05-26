@@ -1,14 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using StardewModdingAPI;
-using TestMod_SV.Models;
+using TestMod_SV.Api.Controllers;
 using TestMod_SV.Services;
 
 namespace TestMod_SV.Api
@@ -20,7 +15,7 @@ namespace TestMod_SV.Api
     {
         private readonly HttpListener _listener;
         private readonly IMonitor _monitor;
-        private readonly IInventoryService _inventoryService;
+        private readonly ApiRouter _router;
         private readonly string _url;
         private readonly int _port;
         private bool _isRunning;
@@ -37,9 +32,14 @@ namespace TestMod_SV.Api
             _port = port;
             _url = $"http://localhost:{port}/";
             _listener = new HttpListener();
+            // Thêm tiền tố với dấu + để xử lý tất cả các đường dẫn con
             _listener.Prefixes.Add(_url);
             _monitor = monitor;
-            _inventoryService = inventoryService;
+            
+            // Khởi tạo router và đăng ký các controller
+            _router = new ApiRouter(monitor);
+            _router.RegisterController("inventory", new InventoryApiController(monitor, inventoryService));
+            
             _isRunning = false;
         }
 
@@ -101,7 +101,7 @@ namespace TestMod_SV.Api
                     HttpListenerContext context = _listener.GetContext();
                     
                     // Xử lý yêu cầu trong một task riêng biệt
-                    Task.Run(() => ProcessRequest(context));
+                    Task.Run(async () => await ProcessRequestAsync(context));
                 }
                 catch (HttpListenerException)
                 {
@@ -119,136 +119,38 @@ namespace TestMod_SV.Api
         /// Xử lý một yêu cầu HTTP cụ thể
         /// </summary>
         /// <param name="context">Context của yêu cầu HTTP</param>
-        private void ProcessRequest(HttpListenerContext context)
+        private async Task ProcessRequestAsync(HttpListenerContext context)
         {
             try
             {
-                string url = context.Request.Url?.AbsolutePath ?? "";
-                _monitor.Log($"Nhận yêu cầu: {url}", LogLevel.Debug);
-
-                // Xử lý các endpoint khác nhau
-                if (url.Equals("/api/inventory", StringComparison.OrdinalIgnoreCase))
-                {
-                    HandleGetInventory(context);
-                }
-                else if (url.StartsWith("/api/inventory/item/", StringComparison.OrdinalIgnoreCase))
-                {
-                    HandleGetInventoryItem(context);
-                }
-                else
-                {
-                    // Endpoint không tồn tại
-                    SendResponse(context, 404, "Endpoint không tồn tại");
-                }
+                // Chuyển yêu cầu đến router
+                await _router.RouteRequestAsync(context);
             }
             catch (Exception ex)
             {
                 _monitor.Log($"Lỗi khi xử lý yêu cầu: {ex.Message}", LogLevel.Error);
-                SendResponse(context, 500, $"Lỗi máy chủ: {ex.Message}");
+                
+                try
+                {
+                    // Gửi phản hồi lỗi
+                    context.Response.StatusCode = 500;
+                    context.Response.ContentType = "text/plain; charset=utf-8";
+                    
+                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes($"Lỗi máy chủ: {ex.Message}");
+                    context.Response.ContentLength64 = buffer.Length;
+                    
+                    using (var output = context.Response.OutputStream)
+                    {
+                        output.Write(buffer, 0, buffer.Length);
+                    }
+                    
+                    context.Response.Close();
+                }
+                catch
+                {
+                    // Bỏ qua lỗi khi gửi phản hồi lỗi
+                }
             }
-        }
-
-        /// <summary>
-        /// Xử lý yêu cầu lấy thông tin túi đồ
-        /// </summary>
-        /// <param name="context">Context của yêu cầu HTTP</param>
-        private void HandleGetInventory(HttpListenerContext context)
-        {
-            if (!StardewValley.Game1.hasLoadedGame)
-            {
-                SendResponse(context, 400, "Người chơi chưa vào thế giới game");
-                return;
-            }
-
-            var inventory = _inventoryService.GetPlayerInventory();
-            SendJsonResponse(context, 200, inventory);
-        }
-
-        /// <summary>
-        /// Xử lý yêu cầu lấy thông tin một vật phẩm cụ thể
-        /// </summary>
-        /// <param name="context">Context của yêu cầu HTTP</param>
-        private void HandleGetInventoryItem(HttpListenerContext context)
-        {
-            if (!StardewValley.Game1.hasLoadedGame)
-            {
-                SendResponse(context, 400, "Người chơi chưa vào thế giới game");
-                return;
-            }
-
-            string url = context.Request.Url?.AbsolutePath ?? "";
-            string[] segments = url.Split('/');
-            
-            if (segments.Length < 5 || !int.TryParse(segments[4], out int slotNumber))
-            {
-                SendResponse(context, 400, "Vị trí vật phẩm không hợp lệ");
-                return;
-            }
-
-            if (slotNumber < 1 || slotNumber > StardewValley.Game1.player.MaxItems)
-            {
-                SendResponse(context, 400, $"Vị trí không hợp lệ. Phải từ 1 đến {StardewValley.Game1.player.MaxItems}");
-                return;
-            }
-
-            var item = _inventoryService.GetInventoryItem(slotNumber);
-            
-            if (item == null)
-            {
-                SendResponse(context, 404, $"Không tìm thấy vật phẩm ở vị trí {slotNumber}");
-                return;
-            }
-
-            SendJsonResponse(context, 200, item);
-        }
-
-        /// <summary>
-        /// Gửi phản hồi HTTP dạng văn bản
-        /// </summary>
-        /// <param name="context">Context của yêu cầu HTTP</param>
-        /// <param name="statusCode">Mã trạng thái HTTP</param>
-        /// <param name="message">Thông điệp phản hồi</param>
-        private void SendResponse(HttpListenerContext context, int statusCode, string message)
-        {
-            context.Response.StatusCode = statusCode;
-            context.Response.ContentType = "text/plain; charset=utf-8";
-            
-            byte[] buffer = Encoding.UTF8.GetBytes(message);
-            context.Response.ContentLength64 = buffer.Length;
-            
-            using (Stream output = context.Response.OutputStream)
-            {
-                output.Write(buffer, 0, buffer.Length);
-            }
-            
-            context.Response.Close();
-        }
-
-        /// <summary>
-        /// Gửi phản hồi HTTP dạng JSON
-        /// </summary>
-        /// <param name="context">Context của yêu cầu HTTP</param>
-        /// <param name="statusCode">Mã trạng thái HTTP</param>
-        /// <param name="data">Dữ liệu để chuyển đổi thành JSON</param>
-        private void SendJsonResponse(HttpListenerContext context, int statusCode, object data)
-        {
-            context.Response.StatusCode = statusCode;
-            context.Response.ContentType = "application/json; charset=utf-8";
-            
-            string json = JsonSerializer.Serialize(data, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-            
-            byte[] buffer = Encoding.UTF8.GetBytes(json);
-            context.Response.ContentLength64 = buffer.Length;
-            
-            using (Stream output = context.Response.OutputStream)
-            {
-                output.Write(buffer, 0, buffer.Length);
-            }
-            
-            context.Response.Close();
         }
     }
 }
