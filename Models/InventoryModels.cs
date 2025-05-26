@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace StardewValleyMCP.Models
 {
@@ -68,5 +69,17 @@ namespace StardewValleyMCP.Models
         /// Thời gian lấy dữ liệu
         /// </summary>
         public DateTime Timestamp { get; set; } = DateTime.Now;
+    }
+    
+    /// <summary>
+    /// Mô hình yêu cầu lấy thông tin vật phẩm bằng phương thức POST
+    /// </summary>
+    public class InventoryItemRequest
+    {
+        /// <summary>
+        /// Vị trí của vật phẩm trong túi đồ (bắt đầu từ 1)
+        /// </summary>
+        [JsonPropertyName("slotNumber")]
+        public int SlotNumber { get; set; }
     }
 }
